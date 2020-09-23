@@ -1,0 +1,91 @@
+---
+title: "Chapter 6"
+author: "Tao Huang"
+output: 
+  pdf_document:
+    #toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, echo=FALSE, warning=FALSE, include=FALSE}
+library(knitr)
+library(rmarkdown)
+library(bookdown)
+library(formattable)
+library(kableExtra)
+library(dplyr)
+library(magrittr)
+library(prettydoc)
+library(htmltools)
+library(knitcitations)
+
+#Generate BibTex citation file for all R packages used to produce report
+knitr::write_bib(.packages(), file = 'packages.bib')
+```
+
+# 6.1.1 R Make-like files
+## Example R make-like file
+## Sourcing functions is good practice because it is:
+## Reusable: It allows you to reuse functions over and over using the same code (i.e. you don’t have to copy and paste the function into each new analysis script).
+## Easy to Maintain: It allows you to quickly fix a function that doesn’t work properly - only once.
+## Sharable: In the same way that a library can be used by anyone, you can share your R script containing your functions with anyone, too. This is the first step towards creating an R package!
+### https://www.earthdatascience.org/courses/earth-analytics/multispectral-remote-sensing-data/source-function-in-R/
+```{r}
+# Set working directory
+setwd("/Users/owner/Desktop/EEB603/Ch6")
+source("plot.R")
+plot_density(1,2)
+```
+
+# 6.2 Importing Locally Stored Data Sets
+## .csv
+### read.csv
+```{r}
+tick<-read.csv("/Users/owner/Desktop/EEB603/Ch6/neon_CLBJ_Dermacentor.csv",sep=",",header = T)
+head(tick)
+```
+### read.table
+```{r}
+tick2<-read.table("/Users/owner/Desktop/EEB603/Ch6/neon_CLBJ_Dermacentor.csv",sep=",",header = T)
+head(tick2)
+```
+
+### write.csv
+
+## .Rdata
+### load()
+### save()
+
+# 6.3 Importing Data Sets from the Internet
+## 6.3.1 Data from non-secure (http) URLs
+```{r}
+tick3<-read.csv("https://raw.githubusercontent.com/th2018/EEB603_ch6/master/neon_HARV_Dermacentor.csv")
+head(tick3)
+```
+
+# 6.3.4 Data APIs & feeds
+```{r}
+# install neonUtilities - can skip if already installed
+#install.packages("neonUtilities")
+# load neonUtilities
+library(neonUtilities)
+
+```
+
+## The identifier of the NEON data product: https://data.neonscience.org/data-products/explore
+```{r}
+zipsByProduct(dpID="DP1.20093.001", #Chemical properties of surface water
+              site="BIGC", #Upper Big Creek, CA
+              startdate = "2019-01", enddate = "2019-04",
+              check.size = FALSE #R would ask you to approve the file size
+              #,package = "basic", avg = "all", savepath = NA,load = F
+  )
+```
+
+# 6.4 Advanced Automatic Data Gathering: Web Scraping
+```{r echo=FALSE}
+
+```
