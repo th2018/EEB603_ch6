@@ -1,7 +1,7 @@
 ---
 title: "Chapter 6"
 subtitle: 'Part A: Importing Data Sets from the Internet'
-author: "Tao, Kara"
+author: "Tao Huang & Kara Navock"
 date: "`r Sys.Date()`" #YAML
 output: 
   pdf_document:
@@ -13,14 +13,17 @@ urlcolor: blue
 \newpage
 
 # Learning outcomes
-(1) Knowing how to import data into R.
-(2) Being able to download data through APIs.
+(1) Know how to import data into R.
+(2) Be able to explain web scraping.
+(3) Be able to download data through APIs.
 
 Files are as follows:
 
 - \verb|Ch6_1 2.Rmd|: This is the \verb|.Rmd| file used to compile the pdf of this class. 
 
-### https://www.neonscience.org/resources/data-tutorials?type=All&field_ds_tags_tid=All&field_ds_languages_tid=1215&page=7
+1. Import structured data
+2. Import unstructured data through APIs and packages
+3. Import unstructured data through web scraping
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -45,8 +48,12 @@ for (p in c("knitr","rmarkdown","formattable","kableExtra","dplyr","magrittr","p
 knitr::write_bib(.packages(), file = 'packages.bib')
 ```
 
-# Data format
-### .Rdata: The best way to store objects from R is with .RData files.
+setwd()
+
+Data format
+.Rdata: The best way to store objects from R is with .RData files.
+
+A section introducing the data (dataset) used to support these exercises 
 
 # 6.3 Importing Data Sets from the Internet
 ### (a) Before you can analyze and visualize data, you have to get that data into R.
@@ -57,14 +64,21 @@ knitr::write_bib(.packages(), file = 'packages.bib')
 ### A URL can be typed into your browser's address bar.
 ### import with read.csv
 ```{r , echo=TRUE, results="hide" }
-#https://raw.githubusercontent.com/karanavock/Rep_Sci/master/DB8.csv
+
+
 #Open a connection.
+
+url("https://raw.githubusercontent.com/karanavock/Rep_Sci/master/DB8.csv")
+
+#If you see "r" mode, you can read it
+
 url("https://raw.githubusercontent.com/karanavock/Rep_Sci/master/DB8.csv")
   #Modes: "r"(read), "w"(write)
 #import the URL
 URL_data<-read.csv("https://raw.githubusercontent.com/karanavock/Rep_Sci/master/DB8.csv")
 # what kind of object is it?
 class(URL_data) # A data frame is a table
+#The data from the URL is now in a data.frame now.
 #check the head of the data
 head(URL_data)
 summary(URL_data)
@@ -72,20 +86,25 @@ URL_complete<-URL_data[complete.cases(URL_data),]
 ```
 
 
+
 ```{r URL_data, echo=FALSE, results="hide", fig.cap="Plot of width in relation to height.", out.width = '100%'}
 plot(URL_data$Height,URL_data$Width,xlab = "Height",ylab="Width")
 ```
-
 
 ## 6.3.1 Data from non-secure (http) URLs
 ### import with read.table
 ```{r}
 URL_data_2<-read.table("https://raw.githubusercontent.com/karanavock/Rep_Sci/master/DB8.csv")
+
+#header: a logical value indicating whether the file contains the names of the variables as its first line. 
+#sep: the field separator character.
+
 head(URL_data_2)
 ```
 
-## download.file is used to download a file from the Internet.
-### download.file from https://www.neonscience.org/data/about-data/spatial-data-maps
+download.file is used to download a file from the Internet.
+Example: download.file from https://www.neonscience.org/data/about-data/spatial-data-maps using the neonUtilities R package
+The neonUtilities R package is designed specifically to access the NEON API.
 ```{r}
 #download.file(url, destfile)
 #download.file("https://www.neonscience.org/sites/default/files/NEONAquaticWatershed.zip",destfile="/Users/owner/Desktop/NEONAquaticWatershed.zip")
@@ -93,6 +112,7 @@ head(URL_data_2)
 url="https://www.neonscience.org/sites/default/files/NEONAquaticWatershed.zip"
 destfile="NEONAquaticWatershed.zip"
 download.file(url, destfile)
+
 
 ```
 
@@ -106,15 +126,41 @@ download.file("https://mikethetesternz.files.wordpress.com/2019/02/apinotipa.png
 #download.file("https://cshperspectives.cshlp.org/content/8/9/a023218.full.pdf",destfile="/Users/owner/Desktop/EEB603/Ch6/paper.pdf")
 ```
 
-## source_data
+# 6.4 Advanced Automatic Data Gathering: Web Scraping
 
-## Data retrieval from internet: (1) web scraping or (2) web APIs.
-### HTML (Right-click the page and click on “View Page Source,”)
-### Some websites have web APIs.
+Data retrieval from internet: (1) web scraping or (2) web APIs.
+Web scraping is the process of collecting and parsing raw data from the Web.
+Collecting data from websites using an automated process is known as web scraping. 
+HTML (Right-click the page and click on “View Page Source,”)
+To extract the HTML from the page.
+Some websites have web APIs.
+
+#Pseudocode for Web Scraping 
+#Example:export number of papers of each species on Google Scholar
+```{r}
+#creat a lisf of birds
+#for (bird in bird_list)
+  #{
+  #enter the bird into the search bar
+  #hit search
+  #export the number of papers
+  #}
+```
+
+Skills you need: HTML and looping
 
 # 6.3.4 Data APIs & feeds
 
-```{r Fig_1, echo=FALSE, fig.cap="API Request https://www.dataquest.io/blog/r-api-tutorial/", out.width = '100%'}
+APIs present researchers with a diverse set of data sources through a standardised access mechanism: send a pasted together HTTP request, receive JSON or XML in return.
+
+In response to an API request, the API will return an HTTP response that includes: (1) An HTTP status code. (2) Headers, key-value pairs. (3) A body typically consisting of XML, JSON, plain text, HTML, or some kind of binary representation.
+
+We need to parse the output into an R object.
+
+Some packages API:
+rnoaa
+
+```{r Fig_1, echo=FALSE, fig.cap="API Request (https://www.dataquest.io/blog/r-api-tutorial/)", out.width = '100%'}
 knitr::include_graphics("/Users/owner/Desktop/EEB603/Ch6/api-request.png")
 ```
 
@@ -123,10 +169,12 @@ knitr::include_graphics("/Users/owner/Desktop/EEB603/Ch6/api-request.png")
 knitr::include_graphics("/Users/owner/Desktop/EEB603/Ch6/functions_and_classes.png")
 ```
 
-## The term API is an acronym, and it stands for Application Programming Interface.
-## APIs offer users a polished way to request clean and curated data from a website. 
-## To work with APIs in R, we need to bring in some libraries. 
-### httr::GET (request to the server)
+The term API is an acronym, and it stands for Application Programming Interface.
+APIs offer users a polished way to request clean and curated data from a website. 
+To work with APIs in R, we need to bring in some libraries. 
+### httr::GET (request to the server) 
+The GET method means retrieve whatever information
+### class(httr::GET("https://www.google.com/"))
 ```{r}
 # install neonUtilities - can skip if already installed
 #install.packages("neonUtilities")
@@ -144,15 +192,31 @@ zipsByProduct(dpID="DP1.20093.001", #Chemical properties of surface water
   )
 ```
 
+##exercise
+```{r}
+#find Breeding landbird point counts (DP1.10003.001) in Dead Lake, AL (DELA) from 2016 to 2019 with the function zipsByProduct
+
+```
+
+
 # To sum up
-## read.csv
+1. What function can you use to read a csv from a URL?
+### read.csv
+2. What function can you use to download a file from a URL?
 ## download.file
-## APIs
+#urls <- c("http://link1", "http://link2", "http://link3")
+#for (url in urls) {download.file(url, destfile = basename(url))}
+3. Which of the following statements about web scraping and web APIs are true:
+- All websites have APIs.
+- A web scraping script for Website A can be applied to Website B.
+- A http request returns XML or JSON files.
 
 # References
 ```{r echo=FALSE, include=FALSE}
 #write.bibtex(file='packages.bib')
 ```
 
-source_DropboxData
-source_data
+----
+### https://www.neonscience.org/resources/data-tutorials?type=All&field_ds_tags_tid=All&field_ds_languages_tid=1215&page=7
+#source_DropboxData
+# DispropData <- repmis::source_data(UrlAddress)
